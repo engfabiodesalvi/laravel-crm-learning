@@ -12,7 +12,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Libera a URL '/usuario' da checagem do token no Laravel 13
+        // Obs: Separar as rotas entre Web.php e Api.php para tornar a aplicação profissional e deixar de utilizar este método!!
+        $middleware->preventRequestForgery(except: [
+            'usuario', // Rota a ser ignorada
+        ]);
+
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
