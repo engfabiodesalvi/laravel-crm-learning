@@ -56,3 +56,84 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+
+---
+
+# Anotações realizadas durante o projeto
+
+## Atualização das tabelas após definir novo diretório e arquivo para a base de dados afim de apermitir a execução do sistema
+
+Neste exemplo foi necessário executar o comando `migrate` para criar as tabels da base de dados e permitir a execução do sistema sem erros, diferente do tutorial.
+
+Erro:
+>Illuminate\Database\QueryException
+vendor/laravel/framework/src/Illuminate/Database/Connection.php:857
+SQLSTATE[HY000]: General error: 1 no such table: sessions (Connection: sqlite, Database: /home/engfabiodesalvi/Dio Cursos/Desenvolvimento Avancado PHP/banco/laravel.sqlite3, SQL: select * from "sessions" where "id" = 7xYtJeCxJtuZOieMTk71i4tWxIR6HyD3vN5MahGR limit 1)
+
+```bash
+$ php artisan config:cache
+$ php artisan cache:clear
+$ php artisan migrate
+```
+
+## Ativação do servidor do php
+
+```bash
+$ php artisan serve
+```
+
+
+## Sintaxe nova para especificar o controlador em uma rota
+
+Atenção: Separar as requições que serão utilizadas pelo aplicativo (`Web.php`) das requisições externas (`Api.php`).
+Ao tentar configurar uma rota na classe `Web.php` para responder a requisições de aplicativos como Insomnia será exibido uma resposta `419` de página expirada.
+
+### Mantendo a asintaxe antiga
+
+Especificar o caminho completo do controlador nas verções novas do Laravel:
+
+```php
+Route::get('/', 'App\Http\Controllers\UsuarioController@cadastrar');
+```
+
+### Utilizando a sintaxe nova
+
+```php
+Route::get('/usuario', [UsuarioController::class, 'cadastrar']);
+```
+
+### Definindo dois verbos para uma mesma rota
+
+Utiliza o mesmo método em mais de uma rota
+
+```php
+Route::match(['get', 'post'], '/usuario', [UsuarioController::class, 'cadastrar']);
+```
+
+Definir no método uma forma de verificar o verbo
+
+```php
+public function cadastrar(Request $request)
+{
+    // Validando qual o verbo está requisitando o método
+
+    if ($request->isMethod('post'))
+    {
+        // Evitar o uso de echo
+        // echo 'POST: cadastrar';  
+        return $this->salvar($request);
+    }
+
+    if ($request->isMethod('get'))
+    {
+        // Evitar o uso de echo
+        // echo 'GET: cadastrar';
+        return response()->json(
+            [
+                'mensagem' => 'GET: cadastrar'
+            ]
+        );
+    }
+}
+```
