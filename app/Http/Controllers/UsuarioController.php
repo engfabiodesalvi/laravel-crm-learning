@@ -4,13 +4,24 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Models\Model\UsuarioModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UsuarioController extends Controller
 {
     public function cadastrar(Request $request)
     {
-        // Validando qual o verbo está requisitando o método
+        // Compara as hashing.
+        // Hash::make() sempre retorna uma hash diferente para a mesma string.
+        // dd(
+            // Hash::make('123'),
+            // md5('123'),
+            // sha1('123'),
+            // hash('sha256', '123')
+        // );
+
+        // Valida qual o verbo que está requisitando o método
 
         if ($request->isMethod('post'))
         {
@@ -23,22 +34,46 @@ class UsuarioController extends Controller
         {
             // Evitar o uso de echo
             // echo 'GET: cadastrar';
-            return response()->json(
-                [
-                    'mensagem' => 'GET: cadastrar'
-                ]
-            );
+            // return response()->json(
+            //     [
+            //         'mensagem' => 'GET: cadastrar'
+            //     ]
+            // );
+            // return view('welcome');
+            // return view('layout.base');
+            return view('usuario.cadastro');
         }
     }
 
     public function salvar(Request $request) 
     {
-        // Esta função gera erro interno no servidor ao interromper uma função de forma abrupta
+        // Valida os campos do formulário
+        $request->validate([
+            "nome" => "required",
+            "email" => "required|email",
+            "senha" => "required|min:5"
+        ]);
+
+        // Cadastra usuário
+        if (UsuarioModel::cadastrar($request)) {
+            return view('usuario.sucesso',
+            [
+                "fulano" => $request->input('nome')
+            ]
+            );
+        } else {
+            echo "Ops! Falha ao cadastrar!";
+        }
+
+
+        // // Esta função gera erro interno no servidor ao interromper uma função de forma abrupta
         // dd($request->all());
 
-        // Utilizar return
-        return response()->json(
-            $request->all()
-        );
+        // // Utilizar return
+        // return response()->json(
+        //     $request->all()
+        // );
+
+        // return view('usuario.sucesso');
     }
 }
