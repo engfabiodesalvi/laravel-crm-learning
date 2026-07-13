@@ -137,3 +137,95 @@ public function cadastrar(Request $request)
     }
 }
 ```
+
+## Definindo rotas da api
+
+Instalando o arquivo de API:
+
+```bash
+php artisan install:api
+```
+
+Configurando uma rota da api
+
+```php
+Route::prefix('v1')->group(function(){
+    Route::get('lista', function(){
+        return ["a", "b", "c"];
+    });
+
+    Route::post('cadastra', function(){
+        return 'implementar post v1';
+    });
+});
+```
+
+## Eloquent e Blade
+
+O Eloquent é o ORM (Mapeamento Objeto-Relacional) nativo do framework Laravel. Ele permite interagir com bancos de dados relacionais (como MySQL e PostgreSQL) utilizando objetos e métodos em PHP, em vez de escrever consultas SQL complexas.
+
+O Blade e o Eloquent não se conectam diretamente no banco de dados, mas trabalham juntos para exibir as informações na tela.
+
+O Eloquent busca os dados do banco de dados e o Blade renderiza (mostra) esses dados no HTML.
+
+O Fluxo de Trabalho (MVC)
+
+- Controller: Pede os dados ao Eloquent.
+
+- Eloquent: Busca no banco e envia para o Controller como objeto ou coleção.
+
+- Controller: Passa esses objetos para a View do Blade.
+
+## Formatação CSS
+
+Utilizar a funcionalidade MIX para otimizar o css.
+
+## Hashing e criptografia
+
+Não, essas funções não são criptografias, são funções de hashing.
+A criptografia é um processo de duas vias (reversível), onde você pode cifrar e decifrar um texto usando uma chave. O hashing é um processo de via única (irreversível); você transforma o dado em uma pegada digital digital que não pode ser desfeita para revelar o texto original.
+------------------------------
+### Hash::make('123') (Bcrypt / Argon2)
+Usa os algoritmos Bcrypt ou Argon2 por padrão no Laravel. É o padrão ouro para senhas.
+
+* Vantagens: Extremamente seguro, lento por design (dificulta ataques de força bruta) e gera hashes diferentes para a mesma senha automaticamente (usa salt interno).
+* Desvantagens: Consome mais memória/processamento do servidor e o resultado é longo (geralmente 60+ caracteres).
+
+### md5('123')
+Algoritmo antigo de 128 bits criado em 1991.
+
+* Vantagens: Extremamente rápido e gera strings curtas (32 caracteres), ideal para checar integridade de arquivos leves.
+* Desvantagens: Completamente quebrado e inseguro para senhas, sofrendo facilmente com ataques de colisão (duas senhas diferentes gerando o mesmo hash).
+
+### sha1('123')
+Algoritmo de 160 bits desenvolvido pela NSA em 1995.
+
+* Vantagens: Muito rápido e amplamente compatível com sistemas legados e controle de versão (como o Git).
+* Desvantagens: Também é considerado inseguro hoje em dia e vulnerável a ataques de colisão gerados por supercomputadores.
+
+### hash('sha256', '123')
+Algoritmo moderno da família SHA-2 que gera uma assinatura de 256 bits (64 caracteres).
+
+* Vantagens: Altamente seguro contra colisões, ideal para chaves de API, assinaturas digitais, webhooks e verificação de arquivos.
+* Desvantagens: Por ser muito rápido para computadores modernos, é inseguro para salvar senhas de usuários (fácil de quebrar por força bruta).
+
+
+## Validação de dados e formulários
+
+### Validação de dados
+
+Utilizar ``
+
+```php
+// Valida os campos do formulário
+$request->validate([
+    "nome" => "required",
+    "email" => "required|email",
+    "senha" => "required|min:5"
+]);
+```
+### Validação de formulários
+
+Utilizar `Form Request Validation`
+
+## 
