@@ -13,9 +13,32 @@ use Illuminate\Support\Facades\Route;
 
 
 // Utiliza a sintaxe moderna (recomendado)
-// Route::get('/usuario', [UsuarioController::class, 'cadastrar']);
-
+Route::get(
+    '/usuario',
+    [
+        UsuarioController::class,
+        'cadastrar'
+    ]
+)->name('home');
+// Route::post('/usuario/salvar/{id}/teste', [UsuarioController::class, 'salvar'])->name('salvar');
+Route::post(
+    '/usuario/salvar', 
+    [
+        UsuarioController::class, 
+        'salvar'
+    ]
+)->name('salvar');
 
 // Utiliza o mesmo método em mais de uma rota
 // (Validar qual o verbo realiza a requisição dentro do método)
-Route::match(['get', 'post'], '/usuario', [UsuarioController::class, 'cadastrar']);
+Route::match(
+    [
+        'get',
+        'post'
+    ],
+    '/usuario',
+    [
+        UsuarioController::class,
+        'cadastrar'
+    ]
+);
