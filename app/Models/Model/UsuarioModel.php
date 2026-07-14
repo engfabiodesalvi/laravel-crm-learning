@@ -4,6 +4,7 @@ namespace App\Models\Model;
 
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -14,16 +15,38 @@ class UsuarioModel extends Model
     protected $connection = 'sqlite';
     protected $table = 'usuarios';
 
+    /**
+     * Define os casts nativos do Laravel
+     */
+    protected function casts(): array
+    {
+        return [
+            'data_cadastro' => 'datetime',
+        ];
+    }
+
+    /**
+     * Accessor para garantir o fuso horário correto na camada de apresentação
+     */
+    public function getDataCadastroAttribute(mixed $value)
+    {
+        return $value 
+            ? Carbon::parse($value)->timezone('America/Sao_Paulo')->format('Y-m-d H:i:s') 
+            : null;
+    }   
+
     public static function listar(int $limite){
-        $sql = self::select([
+        $sqlUsuarios = self::select([
             "id",
             "nome",
             "email",
             "data_cadastro"
         ])
-        ->limit($limite);
+        ->limit($limite)
+        ->get();
         
-        dd($sql->toSql());
+        // dd($sql->toSql());
+        return $sqlUsuarios;
     }
 
     public static function cadastrar(Request $request){
