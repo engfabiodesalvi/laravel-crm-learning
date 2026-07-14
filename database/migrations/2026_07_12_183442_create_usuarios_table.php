@@ -28,7 +28,6 @@ return new class extends Migration
         ");    
 
         
-
         // Padrão Blueprint 
         // ASC: ordenação padrão de chaves primárias assumida pelo Blueprint
         // ON CONFLICT ROLLBACK: Construtor agnóstico (funciona em MySQL, PostgreeSQL, SQLite e SQL Server), esta cláusula não pssui um método nativo no Blueprint.
