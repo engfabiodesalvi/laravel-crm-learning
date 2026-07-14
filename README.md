@@ -184,6 +184,7 @@ Utilizar a funcionalidade MIX para otimizar o css.
 
 Não, essas funções não são criptografias, são funções de hashing.
 A criptografia é um processo de duas vias (reversível), onde você pode cifrar e decifrar um texto usando uma chave. O hashing é um processo de via única (irreversível); você transforma o dado em uma pegada digital digital que não pode ser desfeita para revelar o texto original.
+
 ------------------------------
 ### Hash::make('123') (Bcrypt / Argon2)
 Usa os algoritmos Bcrypt ou Argon2 por padrão no Laravel. É o padrão ouro para senhas.
