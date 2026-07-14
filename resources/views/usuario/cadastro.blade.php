@@ -11,7 +11,7 @@
 
         <div class="field">
             <label  for="nome">Nome:</label>
-            <input type="text" name="nome" id="nome" />
+            <input type="text" name="nome" id="nome" value="{{ old('nome') }}"/>
 
             @if($errors->has('nome'))
                 @foreach ($errors->get('nome') as $error)
@@ -22,7 +22,7 @@
 
         <div class="field">
             <label  for="email">E-mail:</label>
-            <input type="email" name="email" id="email" />
+            <input type="email" name="email" id="email" value="{{ old('email') }}"/>
 
             @if($errors->has('email'))
                 @foreach ($errors->get('email') as $error)

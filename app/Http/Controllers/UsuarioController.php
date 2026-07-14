@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreUsuarioRequest;
 use App\Models\Model\UsuarioModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -45,25 +46,47 @@ class UsuarioController extends Controller
         }
     }
 
-    public function salvar(Request $request) 
+    //public function salvar(Request $request) 
+    public function salvar(StoreUsuarioRequest $request) 
     {
-        // Valida os campos do formulário
-        $request->validate([
-            "nome" => "required",
-            "email" => "required|email",
-            "senha" => "required|min:5"
-        ]);
+        // // Valida os campos do formulário
+        // $request->validate([
+        //     "nome" => "required",
+        //     "email" => "required|email",
+        //     "senha" => "required|min:5"
+        // ]);
+
+        // // Cadastra usuário
+        // if (UsuarioModel::cadastrar($request)) {
+        //     return view('usuario.sucesso',
+        //     [
+        //         "fulano" => $request->input('nome')
+        //     ]
+        //     );
+        // } else {
+        //     echo "Ops! Falha ao cadastrar!";
+        // }
 
         // Cadastra usuário
-        if (UsuarioModel::cadastrar($request)) {
-            return view('usuario.sucesso',
-            [
-                "fulano" => $request->input('nome')
-            ]
-            );
-        } else {
-            echo "Ops! Falha ao cadastrar!";
-        }
+        try {
+            $model = new UsuarioModel();
+            $model->cadastrar($request);
+
+            // return response()->json(['mensagem' => 'Usuário cadastrado com sucesso!'], 201);
+            return  view('usuario.sucesso',
+                        [
+                            "fulano" => $request->input('nome')
+                        ]
+                    );            
+        } catch (\Exception $e) {
+            // Captura o erro do e-mail duplicado ou do rollback e devolve uma resposta amigável
+            return response()->json([
+                'erro' => 
+                    "Ops! Falha ao cadastrar! ". 
+                    $e->getMessage()
+            ], 422); // Status 422: Unprocessable Entity (Erro de validação)
+            // echo "Ops! Falha ao cadastrar!";
+        }        
 
 
         // // Esta função gera erro interno no servidor ao interromper uma função de forma abrupta
