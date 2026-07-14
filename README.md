@@ -183,7 +183,7 @@ Utilizar a funcionalidade MIX para otimizar o css.
 ## Hashing e criptografia
 
 Não, essas funções não são criptografias, são funções de hashing.
-A criptografia é um processo de duas vias (reversível), onde você pode cifrar e decifrar um texto usando uma chave. O hashing é um processo de via única (irreversível); você transforma o dado em uma pegada digital digital que não pode ser desfeita para revelar o texto original.
+A criptografia é um processo de duas vias (reversível), onde você pode cifrar e decifrar um texto usando uma chave. O hashing é um processo de via única (irreversível), transformando o dado em uma pegada digital digital que não pode ser desfeita para revelar o texto original.
 
 ------------------------------
 ### Hash::make('123') (Bcrypt / Argon2)
@@ -616,5 +616,142 @@ Retorno dos valores anteriores após uma excessão através da inclusão do help
 </div>
 ```
 
+## Retorno dos usuários via POST em uma API
 
+### Configurar a rota
 
+Configurar a rota `POST` em `API.php`
+
+```php
+Route::prefix('v1')->group(function(){
+    Route::get('lista', function(){
+        // return ["a", "b", "c"];
+        return UsuarioModel::listar(10);
+    });
+
+    Route::post('cadastra', function(){
+        return 'implementar post v1';
+    });
+});
+```
+
+### Definir o método `listar()`
+
+Definir o método `listar()` dentro da classe `UsuariModel.php`:
+
+```php
+public static function listar(int $limite){
+    $sqlUsuarios = self::select([
+        "id",
+        "nome",
+        "email",
+        "data_cadastro"
+    ])
+    ->limit($limite)
+    ->get();
+    
+    // dd($sql->toSql());
+    return $sqlUsuarios;
+}
+```
+
+### Modificar o fuso horário de `UTC` para outra zona
+
+As datas são armazenadas em forma de string na zona `UTC`, sendo a conversão para outra zona horária realizada utlizando `Mutators/Casts`.
+
+> **Mutators** e **Casts** funcionam como filtros de tratamento automático de dados no Laravel: enquanto os *Casts* convertem os tipos de dados do banco de dados (como transformar uma string de data em um objeto `Carbon` manipulável ou um número em booleano), os *Mutators* (ou *Accessors*) interceptam a leitura ou a escrita de um atributo para aplicar regras personalizadas — como converter uma data do fuso horário UTC para o de Brasília antes de exibi-la na tela, garantindo que toda essa lógica fique organizada dentro do Model e nunca espalhada pelos seus Controllers.
+
+```php
+/**
+ * Define os casts nativos do Laravel
+ */
+protected function casts(): array
+{
+    return [
+        'data_cadastro' => 'datetime',
+    ];
+}
+
+/**
+ * Accessor para garantir o fuso horário correto na camada de apresentação
+ */
+public function getDataCadastroAttribute(mixed $value)
+{
+    return $value 
+        ? Carbon::parse($value)->timezone('America/Sao_Paulo')->format('Y-m-d H:i:s') 
+        : null;
+}   
+```
+
+## Classe de controle de rotas via API
+
+### Criar a classe de controle de rotas via API
+
+A classe `UsuarioController` é criada com o seguinte comando:
+
+```bash
+$ php artisan make:controller API/UsuarioController
+```
+
+### Definir o método `salvar`
+
+Define o método `salvar` utilizando o `FormRequest` que define os requisitos de cadastro que cada novo usuário deve atender:
+
+```php
+class UsuarioController extends Controller
+{
+    public function salvar(StoreUsuarioRequest $request) {
+        if (UsuarioModel::cadastrar($request)) {
+            return response(
+                "Usuário criado com sucesso!", // Created
+                201
+            );
+        } else {
+            return response(
+                "Ops! Falha ao cadastrar!", // Unprocessable Entity
+                422
+            );            
+        }
+        // dd($request->all());
+    }
+}
+```
+
+### Configurar a rota API
+
+A rota API é configura em `routes/api.php`
+
+Utilizando a sintaxe antiga:
+
+```php
+    ...
+    // A sintaxe antiga deve conter o caminho completo da classe
+    Route::post(
+        'cadastra', 'App\Http\Controllers\API\UsuarioController@salvar'
+    );  
+    ...
+```
+
+Ou utilizando a sintaxe moderna:
+
+```php
+    ...
+    // Sintaxe moderna de referência um método de uma classe
+    Route::post(
+        'cadastra', 
+        // function(){
+        //     return 'implementar post v2';
+        // }
+        [
+            APIUsuarioController::class,
+            'salvar'
+        ]
+    );
+    ...
+```
+
+## (TODO) Implementar os outros métodos de cadastro web e requisição da API
+
+Implementar a edição e a remoção de usuários;
+
+## 
